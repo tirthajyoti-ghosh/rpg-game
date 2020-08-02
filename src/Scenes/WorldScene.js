@@ -17,6 +17,8 @@ export default class WorldScene extends Phaser.Scene {
     // this.cameras.main.fade(100);
 
     // start battle
+
+    this.scene.start('Battle');
   }
  
   create () {
