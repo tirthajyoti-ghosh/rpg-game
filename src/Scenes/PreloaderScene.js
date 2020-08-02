@@ -10,6 +10,7 @@ export default class PreloaderScene extends Phaser.Scene {
   }
    
   ready () {
+    this.scene.start('World');
     this.readyCount++;
     if (this.readyCount === 2) {
       this.scene.start('Title');
@@ -84,7 +85,7 @@ export default class PreloaderScene extends Phaser.Scene {
       this.ready();
     }.bind(this));
      
-    this.timedEvent = this.time.delayedCall(3000, this.ready, [], this);
+    this.timedEvent = this.time.delayedCall(1000, this.ready, [], this);
    
     // load assets needed in our game
     this.load.image('phaserLogo', '../src/assets/logo.png');
@@ -93,6 +94,16 @@ export default class PreloaderScene extends Phaser.Scene {
     this.load.image('blueButton2', '../src/assets/ui/blue_button2.png');
     this.load.image('checkedBox', '../src/assets/ui/blue_boxCheckmark.png');
     this.load.audio('bgMusic', ['../src/assets/TownTheme.mp3']);
+
+    // map tiles
+    this.load.image('tiles', '../src/assets/map/spritesheet.png');
+        
+    // map in json format
+    this.load.tilemapTiledJSON('map', '../src/assets/map/map.json');
+    
+    // our two characters
+    this.load.spritesheet('player', '../src/assets/RPG_assets.png', { frameWidth: 16, frameHeight: 16 });
+
   }
  
   create () {
