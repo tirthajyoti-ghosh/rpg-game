@@ -2,6 +2,7 @@ import 'phaser';
 import HeroesMenu from '../Menus/HeroesMenu';
 import EnemiesMenu from '../Menus/EnemiesMenu';
 import ActionsMenu from '../Menus/ActionsMenu';
+import Message from '../Message';
 
 export default class UIScene extends Phaser.Scene {
   constructor() {
@@ -30,6 +31,25 @@ export default class UIScene extends Phaser.Scene {
         this.currentMenu.confirm();
       } 
     }
+  }
+
+  onPlayerSelect(id) {
+    this.heroesMenu.select(id);
+    this.actionsMenu.select(0);
+    this.currentMenu = this.actionsMenu;
+  }
+
+  onSelectEnemies() {
+    this.currentMenu = this.enemiesMenu;
+    this.enemiesMenu.select(0);
+  }
+
+  onEnemy(index) {
+    this.heroesMenu.deselect();
+    this.actionsMenu.deselect();
+    this.enemiesMenu.deselect();
+    this.currentMenu = null;
+    this.battleScene.receivePlayerSelection('attack', index);
   }
 
   create() {
@@ -64,5 +84,14 @@ export default class UIScene extends Phaser.Scene {
     this.remapEnemies();
 
     this.input.keyboard.on('keydown', this.onKeyInput, this);
+
+    this.battleScene.events.on("PlayerSelect", this.onPlayerSelect, this);
+
+    this.events.on("Enemy", this.onEnemy, this);
+
+    this.battleScene.nextTurn();
+
+    this.message = new Message(this, this.battleScene.events);
+    this.add.existing(this.message);
   }
 }

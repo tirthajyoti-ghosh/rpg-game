@@ -8,6 +8,6 @@ export default class ActionsMenu extends Menu {
   }
 
   confirm() {
-
+    this.scene.events.emit('SelectEnemies');
   }
 }
