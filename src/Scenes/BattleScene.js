@@ -34,5 +34,7 @@ export default class BattleScene extends Phaser.Scene {
     
     // Run UI Scene at the same time
     this.scene.launch('UIScene');
+
+    this.index = -1;
   }
 }

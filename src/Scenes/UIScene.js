@@ -8,6 +8,30 @@ export default class UIScene extends Phaser.Scene {
     super('UIScene');
   }
 
+  remapHeroes() {
+    var heroes = this.battleScene.heroes;
+    this.heroesMenu.remap(heroes);
+  }
+
+  remapEnemies() {
+    var enemies = this.battleScene.enemies;
+    this.enemiesMenu.remap(enemies);
+  }
+
+  onKeyInput(event) {
+    if(this.currentMenu) {
+      if(event.code === "ArrowUp") {
+        this.currentMenu.moveSelectionUp();
+      } else if(event.code === "ArrowDown") {
+        this.currentMenu.moveSelectionDown();
+      } else if(event.code === "ArrowRight" || event.code === "Shift") {
+
+      } else if(event.code === "Space" || event.code === "ArrowLeft") {
+        this.currentMenu.confirm();
+      } 
+    }
+  }
+
   create() {
     this.graphics = this.add.graphics();
     this.graphics.lineStyle(1, 0xffffff);
@@ -38,15 +62,7 @@ export default class UIScene extends Phaser.Scene {
 
     this.remapHeroes();
     this.remapEnemies();
-  }
 
-  remapHeroes() {
-    var heroes = this.battleScene.heroes;
-    this.heroesMenu.remap(heroes);
-  }
-
-  remapEnemies() {
-    var enemies = this.battleScene.enemies;
-    this.enemiesMenu.remap(enemies);
+    this.input.keyboard.on('keydown', this.onKeyInput, this);
   }
 }
