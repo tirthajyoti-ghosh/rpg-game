@@ -7,27 +7,68 @@ export default class BattleScene extends Phaser.Scene {
     super('Battle');
   }
 
-  nextTurn() {
-    this.index++;
+  endBattle() {       
+    // clear state, remove sprites
+    this.heroes.length = 0;
+    this.enemies.length = 0;
 
-    // if there are no more units, we start again from the first one
-    if(this.index >= this.units.length) {
-      this.index = 0;
+    for(var i = 0; i < this.units.length; i++) {
+      // link item
+      this.units[i].destroy();            
+    }
+    this.units.length = 0;
+
+    // sleep the UI
+    this.scene.sleep('UIScene');
+
+    // return to WorldScene and sleep current BattleScene
+    this.scene.switch('World');
+  }
+
+  checkEndBattle() {        
+    var victory = true;
+
+    // if all enemies are dead we have victory
+    for(var i = 0; i < this.enemies.length; i++) {
+      if(this.enemies[i].living)
+        victory = false;
     }
 
-    if(this.units[this.index]) {
+    var gameOver = true;
 
-      // if its player hero
-      if(this.units[this.index] instanceof PlayerCharacter) {                
-        this.events.emit('PlayerSelect', this.index);
-      } else { // else if its enemy unit
-        // pick random hero
-        var r = Math.floor(Math.random() * this.heroes.length);
-        // call the enemy's attack function 
-        this.units[this.index].attack(this.heroes[r]);  
-        // add timer for the next turn, so will have smooth gameplay
-        this.time.addEvent({ delay: 3000, callback: this.nextTurn, callbackScope: this });
+    // if all heroes are dead we have game over
+    for(var i = 0; i < this.heroes.length; i++) {
+      if(this.heroes[i].living)
+        gameOver = false;
+    }
+
+    return victory || gameOver;
+  }
+
+  nextTurn() {
+    if(this.checkEndBattle()) {           
+      this.endBattle();
+      return;
+    }
+
+    do {
+      this.index++;
+      // if there are no more units, we start again from the first one
+      if(this.index >= this.units.length) {
+        this.index = 0;
       }
+    } while(this.units[this.index].living);
+    
+    // if its player hero
+    if(this.units[this.index] instanceof PlayerCharacter) {                
+      this.events.emit("PlayerSelect", this.index);
+    } else { // else if its enemy unit
+      // pick random hero
+      var r = Math.floor(Math.random() * this.heroes.length);
+      // call the enemy"s attack function 
+      this.units[this.index].attack(this.heroes[r]);  
+      // add timer for the next turn, so will have smooth gameplay
+      this.time.addEvent({ delay: 3000, callback: this.nextTurn, callbackScope: this });
     }
   }
 
@@ -36,6 +77,16 @@ export default class BattleScene extends Phaser.Scene {
         this.units[this.index].attack(this.enemies[target]);              
     }
     this.time.addEvent({ delay: 3000, callback: this.nextTurn, callbackScope: this });        
+  }
+
+  exitBattle() {
+    this.scene.sleep('UIScene');
+    this.scene.switch('World');
+  }
+
+  wake() {
+    this.scene.run('UIScene');  
+    this.time.addEvent({delay: 2000, callback: this.exitBattle, callbackScope: this});        
   }
 
   create() {
@@ -67,5 +118,9 @@ export default class BattleScene extends Phaser.Scene {
     this.scene.launch('UIScene');
 
     this.index = -1;
+
+    var timeEvent = this.time.addEvent({delay: 2000, callback: this.exitBattle, callbackScope: this});
+
+    this.sys.events.on('wake', this.wake, this);
   }
 }

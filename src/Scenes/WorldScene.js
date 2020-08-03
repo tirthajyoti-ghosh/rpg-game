@@ -18,7 +18,7 @@ export default class WorldScene extends Phaser.Scene {
 
     // start battle
 
-    this.scene.start('Battle');
+    this.scene.switch('Battle');
   }
  
   create () {
