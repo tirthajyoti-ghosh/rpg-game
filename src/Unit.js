@@ -1,8 +1,8 @@
 import 'phaser';
 
 export default class Unit extends Phaser.GameObjects.Sprite {
-  contructor(scene, x, y, texture, frame, type, hp, damage) {
-    super(this, scene, x, y, texture, frame);
+  constructor(scene, x, y, texture, frame, type, hp, damage) {
+    super(scene, x, y, texture, frame);
 
     this.type = type;
     this.maxHp = this.hp = hp;
